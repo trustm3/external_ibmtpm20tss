@@ -59,6 +59,8 @@ typedef struct TSS_CONTEXT TSS_CONTEXT;
 #define TPM_DEVICE		7
 #define TPM_ENCRYPT_SESSIONS	8
 #define TPM_SERVER_TYPE		9
+#define TPM_COMMAND_UDS		100
+#define TPM_PLATFORM_UDS	101
 
 #ifdef __cplusplus
 extern "C" {

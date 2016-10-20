@@ -138,6 +138,8 @@ extern "C" {
 	/* ports, host name, server (packet) type for socket interface */
 	short tssCommandPort;
 	short tssPlatformPort;
+	const char *tssCommandUds;
+	const char *tssPlatformUds;
 	const char *tssServerName;
 	const char *tssServerType;
 

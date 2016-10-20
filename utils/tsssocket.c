@@ -52,6 +52,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/un.h>
 #include <netdb.h>
 #endif
 
@@ -230,11 +231,17 @@ static uint32_t TSS_Socket_Open(TSS_CONTEXT *tssContext, short port)
     WSADATA 		wsaData;
     int			irc;
 #endif
+#ifndef TPM_SOCKET_UDS
     struct sockaddr_in 	serv_addr;
     struct hostent 	*host = NULL;
+#else
+    struct sockaddr_un         serv_addr_uds;
+#endif
 
+#ifndef TPM_SOCKET_UDS
     if (tssVverbose) printf("TSS_Socket_Open: Opening %s:%hu-%s\n",
 			    tssContext->tssServerName, port, tssContext->tssServerType);
+#endif
     /* create a socket */
 #ifdef TPM_WINDOWS
     if ((irc = WSAStartup(0x202, &wsaData)) != 0) {		/* if not successful */
@@ -248,16 +255,32 @@ static uint32_t TSS_Socket_Open(TSS_CONTEXT *tssContext, short port)
     }
 #endif 
 #ifdef TPM_POSIX
+#ifndef TPM_SOCKET_UDS
     if ((tssContext->sock_fd = socket(AF_INET,SOCK_STREAM, 0)) < 0) {
+#else
+	if ((tssContext->sock_fd = socket(AF_UNIX,SOCK_STREAM, 0)) < 0) {
+	#endif
 	if (tssVerbose) printf("TSS_Socket_Open: client socket error: %d %s\n",
 			       errno,strerror(errno));
 	return TSS_RC_NO_CONNECTION;
     }
 #endif
+
+#ifndef TPM_SOCKET_UDS
     memset((char *)&serv_addr,0x0,sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
 
+#else
+    memset((char *)&serv_addr_uds, 0, sizeof(serv_addr_uds));
+    serv_addr_uds.sun_family = AF_UNIX;
+    if (port == tssContext->tssCommandPort)
+        strncpy(serv_addr_uds.sun_path, tssContext->tssCommandUds, sizeof(serv_addr_uds.sun_path)-1);
+    if (port == tssContext->tssPlatformPort)
+        strncpy(serv_addr_uds.sun_path, tssContext->tssPlatformUds, sizeof(serv_addr_uds.sun_path)-1);
+    #endif
+
+#ifndef TPM_SOCKET_UDS
     /* the server host name tssServerName came from the default or an environment variable */
     /* first assume server is dotted decimal number and call inet_addr */
     if ((int)(serv_addr.sin_addr.s_addr = inet_addr(tssContext->tssServerName)) == -1) {
@@ -271,13 +294,18 @@ static uint32_t TSS_Socket_Open(TSS_CONTEXT *tssContext, short port)
 	serv_addr.sin_family = host->h_addrtype;
 	memcpy(&serv_addr.sin_addr, host->h_addr, host->h_length);
     }
+#endif
     /* establish the connection to the TPM server */
 #ifdef TPM_POSIX
+#ifndef TPM_SOCKET_UDS
     if (connect(tssContext->sock_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
 	if (tssVerbose) printf("TSS_Socket_Open: Error on connect to %s:%u\n",
 			       tssContext->tssServerName, port);
 	if (tssVerbose) printf("TSS_Socket_Open: client connect: error %d %s\n",
 			       errno,strerror(errno));
+#else
+    if (connect(tssContext->sock_fd, (struct sockaddr *)&serv_addr_uds, sizeof(serv_addr_uds)) < 0) {
+#endif
 	return TSS_RC_NO_CONNECTION;
     }
 #endif

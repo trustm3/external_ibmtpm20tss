@@ -59,6 +59,8 @@ static TPM_RC TSS_SetTraceLevel(const char *value);
 static TPM_RC TSS_SetDataDirectory(TSS_CONTEXT *tssContext, const char *value);
 static TPM_RC TSS_SetCommandPort(TSS_CONTEXT *tssContext, const char *value);
 static TPM_RC TSS_SetPlatformPort(TSS_CONTEXT *tssContext, const char *value);
+static TPM_RC TSS_SetCommandUds(TSS_CONTEXT *tssContext, const char *value);
+static TPM_RC TSS_SetPlatformUds(TSS_CONTEXT *tssContext, const char *value);
 static TPM_RC TSS_SetServerName(TSS_CONTEXT *tssContext, const char *value);
 static TPM_RC TSS_SetServerType(TSS_CONTEXT *tssContext, const char *value);
 static TPM_RC TSS_SetInterfaceType(TSS_CONTEXT *tssContext, const char *value);
@@ -88,6 +90,14 @@ int tssFirstCall = TRUE;
 
 #ifndef TPM_PLATFORM_PORT_DEFAULT
 #define TPM_PLATFORM_PORT_DEFAULT 	"2322"		/* default for MS simulator */
+#endif
+
+#ifndef TPM_COMMAND_UDS_DEFAULT
+#define TPM_COMMAND_UDS_DEFAULT		"/tmp/tpm2_commands.uds"	/* default for IDS */
+#endif
+
+#ifndef TPM_PLATFORM_UDS_DEFAULT
+#define TPM_PLATFORM_UDS_DEFAULT	"/tmp/tpm2_platform.uds"	/* default for IDS */
 #endif
 
 #ifndef TPM_SERVER_NAME_DEFAULT
@@ -204,6 +214,16 @@ TPM_RC TSS_Properties_Init(TSS_CONTEXT *tssContext)
 	value = getenv("TPM_PLATFORM_PORT");
 	rc = TSS_SetPlatformPort(tssContext, value);
     }
+    /* TPM socket command UDS */
+    if (rc == 0) {
+       value = getenv("TPM_COMMAND_UDS");
+       rc = TSS_SetCommandUds(tssContext, value);
+    }
+    /* TPM simulator socket platform UDS */
+    if (rc == 0) {
+       value = getenv("TPM_PLATFORM_UDS");
+       rc = TSS_SetPlatformUds(tssContext, value);
+    }
     /* TPM socket host name */
     if (rc == 0) {
 	value = getenv("TPM_SERVER_NAME");
@@ -266,6 +286,12 @@ TPM_RC TSS_SetProperty(TSS_CONTEXT *tssContext,
 	    break;
 	  case TPM_PLATFORM_PORT:	
 	    rc = TSS_SetPlatformPort(tssContext, value);
+	    break;
+	  case TPM_COMMAND_UDS: 
+	     rc = TSS_SetCommandUds(tssContext, value);
+	     break;
+	  case TPM_PLATFORM_UDS:        
+	    rc = TSS_SetPlatformUds(tssContext, value);
 	    break;
 	  case TPM_SERVER_NAME:		
 	    rc = TSS_SetServerName(tssContext, value);
@@ -398,6 +424,44 @@ static TPM_RC TSS_SetPlatformPort(TSS_CONTEXT *tssContext, const char *value)
 	    if (tssVerbose) printf("TSS_SetPlatformPort: Error, , value invalid\n");
 	    rc = TSS_RC_BAD_PROPERTY_VALUE;
 	}
+    }
+    return rc;
+}
+
+static TPM_RC TSS_SetCommandUds(TSS_CONTEXT *tssContext, const char *value)
+{
+    TPM_RC             rc = 0;
+
+    /* close an open connection before changing property */
+    if (rc == 0) {
+       rc = TSS_Close(tssContext);
+    }
+    if (rc == 0) {
+       if (value == NULL) {
+           value = TPM_COMMAND_UDS_DEFAULT;
+       }
+    }
+    if (rc == 0) {
+       tssContext->tssCommandUds = value;
+    }
+    return rc;
+}
+
+static TPM_RC TSS_SetPlatformUds(TSS_CONTEXT *tssContext, const char *value)
+{
+    TPM_RC             rc = 0;
+
+    /* close an open connection before changing property */
+    if (rc == 0) {
+       rc = TSS_Close(tssContext);
+    }
+    if (rc == 0) {
+       if (value == NULL) {
+           value = TPM_PLATFORM_UDS_DEFAULT;
+       }
+    }
+    if (rc == 0) {
+       tssContext->tssPlatformUds = value;
     }
     return rc;
 }
