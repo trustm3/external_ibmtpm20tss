@@ -97,6 +97,8 @@ TPM_RC TSS_Execute(TSS_CONTEXT *tssContext,
 #define TPM_DEVICE		7
 #define TPM_ENCRYPT_SESSIONS	8
 #define TPM_SERVER_TYPE		9
+#define TPM_COMMAND_UDS		100
+#define TPM_PLATFORM_UDS	101
 
 LIB_EXPORT
 TPM_RC TSS_SetProperty(TSS_CONTEXT *tssContext,
