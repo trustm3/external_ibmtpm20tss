@@ -93,11 +93,11 @@ int tssFirstCall = TRUE;
 #endif
 
 #ifndef TPM_COMMAND_UDS_DEFAULT
-#define TPM_COMMAND_UDS_DEFAULT		"/tmp/tpm2_commands.uds"	/* default for IDS */
+#define TPM_COMMAND_UDS_DEFAULT		"/data/tpm2_simulator/tpm2_commands.uds"	/* default for IDS */
 #endif
 
 #ifndef TPM_PLATFORM_UDS_DEFAULT
-#define TPM_PLATFORM_UDS_DEFAULT	"/tmp/tpm2_platform.uds"	/* default for IDS */
+#define TPM_PLATFORM_UDS_DEFAULT	"/data/tpm2_simulator/tpm2_platform.uds"	/* default for IDS */
 #endif
 
 #ifndef TPM_SERVER_NAME_DEFAULT
