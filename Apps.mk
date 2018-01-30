@@ -23,7 +23,7 @@ LOCAL_STATIC_LIBRARIES := \
         libc \
         libcutils \
 	libtss \
-	libcrypto_static
+	openssl_libcrypto_static
 
 LOCAL_WHOLE_STATIC_LIBRARIES := libtss
 
@@ -49,7 +49,7 @@ LOCAL_STATIC_LIBRARIES := \
         libc \
         libcutils \
 	libtss \
-	libcrypto_static
+	openssl_libcrypto_static
 
 LOCAL_FORCE_STATIC_EXECUTABLE := true
 LOCAL_MODULE_PATH := $(TARGET_ROOT_OUT_SBIN)
@@ -75,7 +75,7 @@ LOCAL_STATIC_LIBRARIES := \
         libc \
         libcutils \
 	libtss \
-	libcrypto_static
+	openssl_libcrypto_static
 
 LOCAL_FORCE_STATIC_EXECUTABLE := true
 LOCAL_MODULE_PATH := $(TARGET_ROOT_OUT_SBIN)
@@ -101,7 +101,7 @@ LOCAL_STATIC_LIBRARIES := \
         libc \
         libcutils \
 	libtss \
-	libcrypto_static
+	openssl_libcrypto_static
 
 LOCAL_FORCE_STATIC_EXECUTABLE := true
 LOCAL_MODULE_PATH := $(TARGET_ROOT_OUT_SBIN)

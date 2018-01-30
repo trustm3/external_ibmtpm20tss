@@ -15,7 +15,7 @@ tss_c_includes := \
   external/ibmtpm20tss/utils/. \
   external/ibmtpm20tss/utils/tss2 \
   external/ibmtpm20tss/src/. \
-  external/openssl/include \
+  external/openssl_legacy/include \
 
 
 tss_src_files := \
